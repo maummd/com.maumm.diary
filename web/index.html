@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3A6894">
+<title>마음 다이어리 1년</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: phone-first app shell — sticky header + tab bar, one view at a time, cards only for sessions */
+:root{
+  --bg:#F3F6F2; --surface:#FFFFFF; --ink:#22303D; --soft:#55626F; --line:#DCE3DC;
+  --blue:#3A6894; --blue-bg:#E3ECF5; --orange:#B85A24; --orange-bg:#FBEBDD; --green:#2F7A56; --green-bg:#E2F1E8;
+  --q1:#3A6894; --q2:#8A5BA8; --q3:#B85A24; --q4:#2F7A56;
+  --display:'Jua','Noto Sans KR',sans-serif; --body:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#151C22; --surface:#1F2830; --ink:#E8EDF1; --soft:#A7B3BE; --line:#33404B;
+  --blue:#8DB4DC; --blue-bg:#22344A; --orange:#E8A06F; --orange-bg:#3B2A1E; --green:#7FC9A2; --green-bg:#1D3529;
+  --q1:#8DB4DC; --q2:#C6A2E0; --q3:#E8A06F; --q4:#7FC9A2; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151C22; --surface:#1F2830; --ink:#E8EDF1; --soft:#A7B3BE; --line:#33404B;
+  --blue:#8DB4DC; --blue-bg:#22344A; --orange:#E8A06F; --orange-bg:#3B2A1E; --green:#7FC9A2; --green-bg:#1D3529;
+  --q1:#8DB4DC; --q2:#C6A2E0; --q3:#E8A06F; --q4:#7FC9A2; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 96px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:400;font-size:28px;margin:0;line-height:1.2}
+.sub{color:var(--soft);font-size:13px}
+nav{display:flex;gap:6px;margin-top:10px;overflow-x:auto}
+nav a{flex:none;text-decoration:none;color:var(--soft);font-weight:700;font-size:15px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+nav a[aria-current="page"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+nav a:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+h2{font-family:var(--display);font-weight:400;font-size:24px;margin:24px 0 8px;text-wrap:balance}
+h3{font-size:17px;margin:0 0 4px}
+p{margin:0}
+.muted{color:var(--soft);font-size:14px}
+.next{display:flex;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:16px;flex-wrap:wrap}
+.next .big{font-family:var(--display);font-size:44px;line-height:1;color:var(--orange);white-space:nowrap}
+.next>div{min-width:0;flex:1}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--green)}
+.q{margin-top:22px}
+.qhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;border-left:6px solid var(--qc);padding-left:10px}
+.qhead h2{margin:0;color:var(--qc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:10px}
+.chip{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;font:inherit;color:inherit}
+.chip:hover{border-color:var(--qc)}
+.chip .n{font-weight:700;color:var(--qc);font-size:13px;font-variant-numeric:tabular-nums}
+.chip .t{font-weight:700;line-height:1.35}
+.chip .d{font-size:12px;color:var(--soft)}
+.chip.done{opacity:.72}
+.chip.now{border:2px solid var(--orange);background:var(--orange-bg)}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--green-bg);color:var(--green)}
+.tag.now{background:var(--orange-bg);color:var(--orange)}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:16px}
+.detail .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.detail h2{margin:4px 0 0;font-size:28px}
+.sec{margin-top:16px;display:grid;gap:4px}
+.sec b{color:var(--blue);font-size:14px}
+.ex{background:var(--blue-bg);border-radius:12px;padding:12px 14px}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:9px 16px;font:700 15px var(--body);cursor:pointer;text-decoration:none;color:#fff;background:#3A6894}
+.btn.spot{background:#1E7A4C}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.pager{display:flex;justify-content:space-between;margin-top:18px;gap:8px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.weather{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.weather button{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 2px;font:13px var(--body);color:var(--ink);cursor:pointer}
+.weather button[aria-pressed="true"]{border:2px solid var(--orange);background:var(--orange-bg)}
+.weather svg{width:34px;height:34px}
+label{font-weight:700;font-size:14px}
+input[type=text],input[type=date],select,textarea{width:100%;font:16px var(--body);padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.form{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.score{font-family:var(--display);font-size:28px;color:var(--orange);font-variant-numeric:tabular-nums}
+.log{display:grid;gap:8px;margin-top:12px}
+.entry{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.entry svg{width:30px;height:30px;flex:none}
+.entry>div{min-width:0;flex:1}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:12px}
+.chart svg{width:100%;height:auto;display:block}
+.game{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:14px;text-align:center}
+.card-say{font-size:22px;font-weight:700;margin:14px 0;min-height:70px;display:flex;align-items:center;justify-content:center;text-wrap:balance}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.choices button{font:700 18px var(--display);padding:14px 4px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.choices .c-e{border-color:var(--orange)} .choices .c-t{border-color:var(--blue)} .choices .c-a{border-color:var(--green)}
+.fb{min-height:52px;margin-top:12px;font-size:15px}
+.ok{color:var(--green);font-weight:700} .no{color:var(--orange);font-weight:700}
+.tri{display:flex;justify-content:center;margin-top:8px}
+.note{font-size:13px;color:var(--soft);margin-top:10px}
+.pl{display:grid;gap:8px}
+.pl .row input{flex:1;min-width:0}
+@media (max-width:520px){.next{flex-direction:column;align-items:stretch}.next .btn{justify-content:center}.two{grid-template-columns:1fr}.choices button{font-size:16px}.weather button{font-size:11px}h1{font-size:24px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+html{scroll-padding-top:env(safe-area-inset-top,0px)}img{max-width:100%}[hidden]{display:none!important}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+</style>
+</head><body>
+
+
+<div class="wrap">
+<header>
+  <div class="brand"><div><h1>마음 다이어리 1년</h1><p class="sub">구의 연세정신건강의학과 사회문화센터 · 음악인지재활 48회기</p></div></div>
+  <nav aria-label="메뉴">
+    <a href="#plan" data-v="plan">1년 플랜</a>
+    <a href="#session" data-v="session">회기 보기</a>
+    <a href="#diary" data-v="diary">내 다이어리</a>
+    <a href="#game" data-v="game">마음 탐정 게임</a>
+    <a href="#setup" data-v="setup">설정</a>
+  </nav>
+</header>
+<main id="view"></main>
+</div>
+
+<script>
+const W={
+ sun:['맑음','<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="#E9B949"/><g stroke="#E9B949" stroke-width="3" stroke-linecap="round"><path d="M20 3v5M20 32v5M3 20h5M32 20h5M8 8l3 3M29 29l3 3M8 32l3-3M29 11l3-3"/></g></svg>'],
+ part:['구름 조금','<svg viewBox="0 0 40 40"><circle cx="15" cy="14" r="7" fill="#E9B949"/><path d="M12 31h18a6 6 0 0 0 0-12 8 8 0 0 0-15 2 5 5 0 0 0-3 10z" fill="#AEBBC8"/></svg>'],
+ cloud:['흐림','<svg viewBox="0 0 40 40"><path d="M9 30h22a7 7 0 0 0 0-14 9 9 0 0 0-17 2 6 6 0 0 0-5 12z" fill="#8E9CAB"/></svg>'],
+ rain:['비','<svg viewBox="0 0 40 40"><path d="M9 24h22a7 7 0 0 0 0-14 9 9 0 0 0-17 2 6 6 0 0 0-5 12z" fill="#8E9CAB"/><g stroke="#3A6894" stroke-width="3" stroke-linecap="round"><path d="M13 29l-2 5M21 29l-2 5M29 29l-2 5"/></g></svg>'],
+ storm:['천둥번개','<svg viewBox="0 0 40 40"><path d="M9 22h22a7 7 0 0 0 0-14 9 9 0 0 0-17 2 6 6 0 0 0-5 12z" fill="#5E6B78"/><path d="M21 22l-5 9h5l-3 8 9-11h-5l3-6z" fill="#E9B949"/></svg>'],
+ fog:['안개','<svg viewBox="0 0 40 40"><g stroke="#AEBBC8" stroke-width="4" stroke-linecap="round"><path d="M6 14h24M10 21h26M6 28h22"/></g></svg>']
+};
+const Q=[
+ {name:'1분기 · 나를 알기',sub:'마음 다이어리와 나만의 플레이리스트',c:'--q1'},
+ {name:'2분기 · 생각 다루기',sub:'생각의 함정을 찾고 맑은 안경 쓰기',c:'--q2'},
+ {name:'3분기 · 함께 지내기',sub:'관계와 소통, 함께 부르고 연주하기',c:'--q3'},
+ {name:'4분기 · 회복과 일상',sub:'나를 지키는 루틴과 수료 음악회',c:'--q4'}
+];
+// [제목, 목표, 음악 활동, CBT 포인트, 예시, 과제, [노래 표시, 검색어]]
+const S=[
+['반가워요, 마음 날씨','그룹 약속을 정하고 감정을 날씨로 표현하기 시작','노래 소개 릴레이: 내 이름과 좋아하는 노래 한 곡','감정에는 날씨처럼 이름과 세기가 있다','“오늘 저는 구름 조금, 6점이에요. 아침에 버스를 놓쳐서요.”','하루 한 번 마음 날씨와 점수 적기',['사랑으로 (해바라기)','해바라기 사랑으로 가사']],
+['감정에 이름 붙이기','감정 단어를 늘리고 강도를 구별하기','같은 노래를 듣고 떠오른 감정 카드 고르기','“기분 나빠”를 서운함·짜증·불안으로 나눠 보기','“짜증 난 줄 알았는데 사실은 서운했어요.”','하루 한 번 감정 단어 하나 적기',['밤편지 (아이유)','아이유 밤편지 가사']],
+['내 인생의 노래, 내 마음의 믿음','인생의 중요한 순간과 그 순간이 남긴 믿음 찾기','고향의 봄 · 걱정 말아요 그대 · 말하는 대로 함께 부르기','하향 화살표로 핵심 신념 찾기, 믿음 안경','“처음 기타 배운 날 → 나는 해내는 사람이다”','내 믿음과 다른 증거 한 개 찾기',['걱정 말아요 그대 (전인권)','걱정 말아요 그대 가사']],
+['소소한 행복 찾기','기분을 올리는 작은 행동 목록 만들기 (행동 활성화)','행복 리듬 만들기: 박수·발 구르기 4박자','행동이 먼저 바뀌면 기분이 따라온다','“믹스커피 마시며 라디오 듣기 = 기분 +2점”','즐거운 활동 2개 하고 전후 점수 적기',['행복을 주는 사람 (해바라기)','해바라기 행복을 주는 사람']],
+['몸이 보내는 신호','감정이 몸에 주는 신호 알아차리기','느린 곡에 맞춰 4초 들숨·6초 날숨 호흡','불안 → 심장 두근, 어깨 굳음을 알아차리면 조절이 쉬워진다','“화나면 주먹부터 쥐어져요. 그때 숨을 쉬어요.”','하루 한 번 호흡 3번 하고 몸 느낌 적기',['바람이 불어오는 곳 (김광석)','김광석 바람이 불어오는 곳 가사']],
+['생각·감정·행동 삼각형','세 가지를 구별하고 서로 연결된 것 이해하기','마음 탐정 게임: 감정·생각·행동 분류','같은 일도 생각에 따라 감정과 행동이 달라진다','“친구가 문자 답이 없다 → ‘나를 싫어하나’ → 서운 → 연락 끊기”','하루 한 장면을 삼각형으로 적기',['하늘을 달리다 (이적)','이적 하늘을 달리다 가사']],
+['자동적 사고 잡기','순간 스치는 생각을 붙잡아 적어 보기','노래 가사 영상 보며 “마음속 목소리” 찾기','감정이 크게 움직이면 바로 그 직전 생각을 찾는다','“식당 직원이 쳐다봄 → ‘이상하게 보나’ (자동적 사고)”','감정이 7점 이상 움직인 순간의 생각 적기',['거위의 꿈 (인순이)','인순이 거위의 꿈 가사']],
+['나의 강점 찾기','강점 카드로 나의 좋은 점 세 가지 찾기','서로의 강점을 노래 제목으로 선물하기','부정적 필터를 끄고 강점 증거 모으기','“저는 약속을 잘 지켜요. 매주 제일 먼저 와요.”','강점을 쓴 순간 하나 기록',['나는 나비 (윤도현)','윤도현 나는 나비 가사']],
+['고마운 순간 모으기','감사 일기로 하루의 좋은 장면 찾기','감사 릴레이: 노래 한 소절씩 이어 부르기','좋은 일도 의도적으로 찾아야 보인다','“경비 아저씨가 인사해 주셨다.”','하루 감사 세 줄',['You Raise Me Up','You Raise Me Up 가사']],
+['나를 위로하는 말','자기 비난을 자기 친절로 바꾸기','친구에게 하듯 나에게 해 주는 말을 노래 제목으로','친한 친구가 같은 일을 겪으면 뭐라고 말할까?','“나는 왜 이 모양이야” → “오늘은 여기까지도 잘했어”','하루 한 번 나에게 친절한 말 적기',['수고했어 오늘도 (옥상달빛)','옥상달빛 수고했어 오늘도 가사']],
+['나의 플레이리스트 완성','기분별 플레이리스트 (힘낼 때·쉴 때·잠들 때) 만들기','각자 한 곡씩 틀고 이유 말하기','음악은 내가 고를 수 있는 기분 조절 도구','“불안할 때는 백조, 힘낼 때는 말하는 대로”','플레이리스트 카드 들고 다니기',['백조 (생상스)','생상스 백조 첼로']],
+['1분기 작은 음악회','3개월을 돌아보고 서로 축하하기','회원 선곡 합창, 인생 그래프 노래 발표','처음 점수와 지금 점수 비교하기','“처음엔 말도 못 했는데 오늘은 노래를 골랐어요.”','2분기에 해 보고 싶은 것 한 가지',['아리랑','아리랑 합창']],
+['생각의 함정 ① 흑백논리','“전부 아니면 전무” 생각 찾기','음악 볼륨 0~10 조절하며 회색 지대 느끼기','완벽하지 않아도 50점, 70점이 있다','“설거지 반만 했다 → 완전 실패” → “반이나 했다”','흑백 생각 한 개 찾아 점수로 바꾸기',['여행을 떠나요 (조용필)','조용필 여행을 떠나요 가사']],
+['생각의 함정 ② 마음 읽기','다른 사람 생각을 확인 없이 단정하는 습관 찾기','눈 감고 듣고 연주자의 기분 맞히기 → 정답 확인','추측은 사실이 아니다. 확인하는 방법 찾기','“날 무시해” → “바빠서 못 봤을 수도 있다”','추측한 생각 하나를 사실로 확인해 보기',['바람의 노래 (조용필)','조용필 바람의 노래 가사']],
+['생각의 함정 ③ 늘·항상','한 번의 일을 “항상”으로 키우는 생각 찾기','“늘” 대신 “이번엔”으로 노래 한 줄 바꿔 부르기 (멜로디만)','과잉일반화를 구체적인 한 번으로 바꾸기','“나는 항상 실수해” → “어제 한 번 실수했다”','“항상·절대” 쓴 순간 적기',['내 나이가 어때서 (오승근)','오승근 내 나이가 어때서 가사']],
+['생각 기록지 3칸','상황 · 생각 · 감정을 칸에 나눠 적기','기록 전 좋아하는 곡 1분 듣고 마음 가라앉히기','적으면 생각과 나 사이에 거리가 생긴다','“병원 대기 길어짐 | 나만 늦게 불러 | 짜증 7”','하루 한 장 기록지',['그대에게 (신해철)','신해철 그대에게']],
+['증거 찾기','생각을 뒷받침·반박하는 증거 나누기','법정 놀이: 배경음악 틀고 변호사·검사 역할','생각은 가설이고, 증거로 확인한다','“나는 쓸모없다” 반대 증거: 동생 이사 도와줌','증거 표 한 개 채우기',['나는 문제없어 (황규영)','황규영 나는 문제없어 가사']],
+['맑은 안경 쓰기','균형 잡힌 대안 생각 만들기','같은 멜로디를 장조·단조로 들어 보기','회색 안경 · 장밋빛 안경 · 맑은 안경 비교','“그 사람이 날 싫어해” → “아직 잘 모른다, 다음에 인사해 보자”','대안 생각 하나를 실제 상황에 써 보기',['붉은 노을 (이문세)','이문세 붉은 노을 가사']],
+['걱정 시간 정하기','걱정을 하루 15분 정해진 시간에만 하기','타이머 15분 동안 걱정 쓰고 신나는 곡으로 닫기','걱정을 미루면 걱정의 힘이 약해진다','“오후 4시 걱정 시간에만 돈 걱정하기”','걱정 시간 3번 지키기',['슈퍼스타 (이한철)','이한철 슈퍼스타 가사']],
+['문제 해결 5단계','문제 정하기 → 방법 찾기 → 고르기 → 해 보기 → 돌아보기','모둠별로 문제 하나 해결하고 응원가 고르기','막막한 문제도 쪼개면 다룰 수 있다','“약 타러 갈 시간이 없다 → 토요일 오전 진료 알아보기”','작은 문제 하나 5단계로 풀기',['Let It Be (Beatles)','Beatles Let It Be lyrics']],
+['행동 실험','두려운 예측을 작은 행동으로 시험하기','처음 듣는 장르 한 곡 끝까지 들어 보기 실험','예측 → 실험 → 결과 비교','“카페에서 주문하면 떨려서 말 못 할 거야 → 해 보니 됐다”','실험 하나 하고 예측·결과 적기',['질풍가도 (유정석)','유정석 질풍가도 가사']],
+['마음챙김 듣기','지금 이 순간에 주의 머무르기','한 곡을 악기 하나만 따라가며 듣기','생각이 떠다니면 알아차리고 소리로 돌아오기','“생각이 세 번 딴 데 갔지만 다시 피아노로 왔어요.”','하루 3분 집중 듣기',['달빛 (드뷔시)','드뷔시 달빛']],
+['나의 감정 사전','지금까지 배운 감정과 생각을 사전으로 만들기','감정마다 어울리는 노래 한 곡 짝짓기','감정을 알아차리면 선택이 생긴다','“외로움 = 저녁 7시에 자주 옴, 대처: 라디오 켜기”','감정 사전 한 쪽 꾸미기',['가시나무 (시인과 촌장)','시인과 촌장 가시나무 가사']],
+['2분기 마무리 · 개사 노래','배운 맑은 안경 문장으로 노랫말 바꿔 부르기','옛 동요 멜로디에 우리 문장 넣어 부르기','나만의 대처 문장을 노래로 기억하기','산토끼 멜로디: “걱정 시간 정해 놓고 / 오늘 하루 잘 살자”','개사 노래 하루 한 번 흥얼거리기',['산토끼 (동요)','산토끼 동요']],
+['나의 관계 지도','가까운 사람과 도움받을 수 있는 사람 정리','관계 지도에 사람마다 어울리는 노래 붙이기','혼자라는 생각과 다른 증거가 지도에 있다','“가까움: 누나, 사례관리자 선생님 / 가끔: 교회 집사님”','지도에 있는 한 사람에게 안부 묻기',['친구 (안재욱)','안재욱 친구 가사']],
+['나 전달법','“너는 왜” 대신 “나는 ~해서 ~했어”로 말하기','듀엣 곡을 두 모둠이 주고받으며 부르기','비난 없이 내 감정과 바람을 말하기','“문 쾅 닫지 마!” → “문 소리에 나는 깜짝 놀라. 살살 닫아 줄래?”','나 전달법 한 번 써 보기',['너에게 난, 나에게 넌 (자전거 탄 풍경)','자전거 탄 풍경 너에게 난 나에게 넌 가사']],
+['잘 듣기','공감하며 듣고 되돌려 말하기','짝이 고른 노래를 듣고 그 사람의 마음 말해 주기','들은 내용을 내 말로 되짚으면 상대가 안심한다','“그러니까 그날 많이 서운하셨네요.”','하루 한 번 되짚어 말하기',['아름다운 세상 (박학기)','박학기 아름다운 세상 가사']],
+['부탁하기','필요한 도움을 구체적으로 요청하기','“같이 불러 줄래요?” 부탁하고 함께 부르기','부탁은 약함이 아니라 기술이다','“이번 주 목요일에 같이 장 보러 가 줄 수 있어?”','작은 부탁 하나 해 보기',['Lean on Me','Lean on Me lyrics']],
+['거절하기','내 상황을 지키며 부드럽게 거절하기','역할극 뒤 시원한 곡으로 긴장 풀기','거절해도 관계는 지킬 수 있다','“지금은 돈을 빌려줄 수 없어. 대신 같이 알아볼게.”','거절 문장 하나 연습',['난 괜찮아 (진주)','진주 난 괜찮아 가사']],
+['칭찬 주고받기','칭찬을 구체적으로 하고 고맙게 받기','릴레이 칭찬 후 축하 노래 함께 부르기','칭찬을 깎아내리는 생각 알아차리기','“아니에요” 대신 “고마워요, 기분 좋네요”','하루 한 번 칭찬하기',['당신은 사랑받기 위해 태어난 사람','당신은 사랑받기 위해 태어난 사람 가사']],
+['갈등 다루기','화가 날 때 멈추고 말하는 순서 익히기','신호등 노래: 빨강(멈춤)·노랑(생각)·초록(말하기)','화났을 때 생각이 가장 좁아진다','“빨강: 자리 뜨기 → 노랑: 10까지 세기 → 초록: 나 전달법”','신호등 한 번 써 보기',['그것만이 내 세상 (들국화)','들국화 그것만이 내 세상 가사']],
+['가족과 나','가족과의 거리와 바라는 관계 생각하기','가족과 함께 들었던 노래 떠올리기','가족에 대한 “반드시” 생각 살펴보기','“엄마는 날 이해해야 해” → “이해받고 싶다고 말해 보자”','가족에게 노래 한 곡 보내기',['꽃밭에서 (정훈희)','정훈희 꽃밭에서 가사']],
+['함께 리듬 만들기','합주로 협력하고 차례 지키기','붐웨커·컵 타악기로 박자 맞추기','틀려도 다시 들어오면 된다','“박자를 놓쳤지만 다음 마디에 다시 들어왔어요.”','가족·친구와 박수 리듬 해 보기',['We Will Rock You (Queen)','Queen We Will Rock You']],
+['안부 전하기','전화·문자로 관계 이어 가기','안부 문자에 노래 링크 함께 보내기','답이 늦어도 “무시당했다”로 단정하지 않기','“요즘 추운데 잘 지내? 이 노래 듣다가 생각났어.”','안부 문자 한 통',['안부 (별, 나얼)','별 나얼 안부 가사']],
+['노래 편지','고마운 사람에게 노래와 편지 전하기','한 사람에게 바치는 노래 고르고 이유 쓰기','고마움을 표현하면 관계와 기분이 함께 좋아진다','“선생님, 이 노래 들으면 처음 센터 온 날이 생각나요.”','노래 편지 전하기',['상록수 (양희은)','양희은 상록수 가사']],
+['3분기 마무리 합창','함께 지낸 경험 돌아보기','모둠 합창 발표, 서로 박수','관계 지도 다시 그리고 비교하기','“지도에 이름이 두 명 늘었어요.”','4분기에 지키고 싶은 루틴 하나',['아름다운 나라 (신문희)','신문희 아름다운 나라 가사']],
+['스트레스 신호등','나만의 스트레스 신호 초록·노랑·빨강 정리','신호마다 들을 노래 정하기','신호를 일찍 알아채면 작게 대처할 수 있다','“노랑: 잠이 줄고 말이 빨라짐 → 산책과 느린 음악”','신호등 카드 붙여 두기',['바람이 분다 (이소라)','이소라 바람이 분다 가사']],
+['잠과 저녁 루틴','편한 잠을 위한 저녁 습관 만들기','잠들기 음악 3곡 고르고 함께 이완','“못 자면 큰일” 생각이 잠을 더 쫓는다','“10시 화면 끄기 → 따뜻한 물 → 자장가 1곡”','저녁 루틴 5일 지키기',['자장가 (브람스)','브람스 자장가']],
+['몸을 움직여요','즐거운 신체 활동 늘리기','트로트·신나는 곡에 맞춰 의자 체조','움직임 → 기분 점수 변화를 직접 확인','“체조 전 4점 → 후 6점”','하루 10분 움직이고 점수 적기',['무조건 (박상철)','박상철 무조건']],
+['약과 친해지기','복약 루틴과 진료 때 물어볼 질문 정리','복약 시간 알람에 좋아하는 노래 설정하기','“약 먹으면 약한 사람” 같은 생각 살펴보기','“아침 약은 양치 뒤, 알람은 ‘일어나’”','진료 질문 3개 적어 가기',['일어나 (김광석)','김광석 일어나 가사']],
+['재발 경고 신호','나만의 초기 신호와 도움 요청 순서 정리','신호를 알리는 나만의 노래 정하기','초기 신호는 실패가 아니라 정보다','“잠 4시간 이하 3일 → 사례관리자에게 연락”','경고 신호 카드 완성',['흐린 기억 속의 그대 (현진영)','현진영 흐린 기억 속의 그대']],
+['나의 위기 대처 카드','힘들 때 할 일과 연락처 한 장에 정리','카드 뒷면에 마음을 지키는 노래 3곡','혼자 버티지 않고 단계대로 도움 받기','“1. 호흡 2. 플레이리스트 3. 누나에게 전화 4. 센터 연락”','카드 지갑에 넣기',['힘내! (소녀시대)','소녀시대 힘내']],
+['하루 시간표','규칙적인 하루 시간표 만들기','시간대별 배경음악 정하기 (아침·점심·저녁)','작은 일정이 하루를 붙잡아 준다','“9시 산책, 11시 센터, 3시 장보기”','시간표대로 3일 지내기',['세월이 가면 (최호섭)','최호섭 세월이 가면 가사']],
+['나의 꿈과 목표','작고 구체적인 목표 세우기','“꿈” 노래 듣고 내 목표 한 줄 말하기','목표는 작게, 날짜와 행동으로','“3월까지 바리스타 체험 1번 신청”','목표를 위한 첫 행동 하나',['꿈의 대화 (이범용·한명훈)','꿈의 대화 이범용 한명훈 가사']],
+['우리 동네 지도','지역사회 자원(도서관·복지관·공원) 찾기','동네 노래 부르며 자주 가는 곳 표시','혼자가 아닌 증거를 동네에서 찾기','“구의역 도서관 음악 감상실 무료”','새로운 장소 한 곳 가 보기',['동네 한 바퀴 (동요)','동네 한 바퀴 동요']],
+['1년 인생 그래프','1년 전과 지금 비교, 변한 믿음 찾기','3회기 인생 그래프 노래 다시 부르기','처음 찾은 믿음이 어떻게 달라졌나','“나는 혼자다 → 나는 연락할 사람이 있다”','1년 돌아보기 한 쪽',['말하는 대로 (처진 달팽이)','처진 달팽이 말하는 대로 가사']],
+['수료 음악회 준비','발표곡 고르고 역할 나누기','합창 연습, 사회자·소개 멘트 정하기','떨림은 실패 신호가 아니라 준비 신호','“사회 1명, 곡 소개 1명, 박자 리더 1명 정하기”','발표곡 하루 한 번 듣기',['Bravo My Life (봄여름가을겨울)','봄여름가을겨울 Bravo My Life 가사']],
+['수료 음악회','1년을 축하하고 다음 걸음 약속하기','가족·직원 초대 음악회, 수료증','처음 점수와 마지막 점수, 플레이리스트 발표','“제 플레이리스트 마지막 곡은 오늘 부른 노래예요.”','앞으로의 나에게 노래 편지',['걱정 말아요 그대 (이적 버전)','이적 걱정 말아요 그대 응답하라 1988']]
+];
+const GAME=[
+['불안하다','e'],['서운하다','e'],['뿌듯하다','e'],['화가 난다','e'],['외롭다','e'],['설렌다','e'],['창피하다','e'],
+['나는 뭘 해도 안 될 거야','t'],['저 사람이 나를 싫어하나 봐','t'],['오늘은 여기까지도 잘했어','t'],['다들 나만 쳐다보는 것 같아','t'],['한 번 실수했다고 다 망한 건 아니야','t'],['그 사람도 바빴을 수 있지','t'],
+['이불 속에 하루 종일 누워 있었다','a'],['친구에게 먼저 문자를 보냈다','a'],['좋아하는 노래를 틀었다','a'],['문을 쾅 닫았다','a'],['10분 동안 산책했다','a'],['약속을 취소했다','a'],['숨을 4초 들이쉬고 6초 내쉬었다','a']
+];
+const GN={e:'감정',t:'생각',a:'행동'};
+const GH={e:'한두 단어로 된 마음의 느낌이에요. “~하다”로 끝나는 경우가 많아요.',t:'머릿속에서 하는 말이에요. 문장으로 되어 있고, 사실이 아닐 수도 있어요.',a:'눈으로 볼 수 있는 일이에요. 카메라로 찍을 수 있으면 행동!'};
+
+const store={get(k,d){try{const v=localStorage.getItem('md1y:'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('md1y:'+k,JSON.stringify(v))}catch(e){}}};
+const cfg=Object.assign({start:'2026-11-12',sel:3},store.get('cfg',{}));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const yt=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q).replace(/%20/g,'+');
+const sp=q=>'https://open.spotify.com/search/'+encodeURIComponent(q);
+function dateOf(n){const d=new Date(cfg.start+'T00:00:00');d.setDate(d.getDate()+(n-1)*7);return d}
+const fmt=d=>`${d.getMonth()+1}/${d.getDate()}`;
+const DOW='일월화수목금토';
+function today0(){const t=new Date();t.setHours(0,0,0,0);return t}
+function currentN(){const t=today0();for(let n=1;n<=48;n++){if(dateOf(n)>=t)return n}return 48}
+function qOf(n){return Q[Math.floor((n-1)/12)]}
+const V=document.getElementById('view');
+
+function vPlan(){
+  const cur=currentN(),done=cur-1, pct=Math.round(done/48*100), s=S[cur-1], d=dateOf(cur);
+  let h=`<div class="next"><div class="big">${cur}회기</div><div><span class="tag now">다음 회기 · ${d.getFullYear()}. ${fmt(d)}(${DOW[d.getDay()]})</span><h3 style="margin-top:6px">${esc(s[0])}</h3><p class="muted">${esc(s[1])}</p><div class="bar" aria-label="진행률 ${pct}%"><i style="width:${pct}%"></i></div><p class="muted">48회기 중 ${done}회기 완료 · ${pct}%</p></div><button class="btn" data-open="${cur}">회기 열기</button></div>`;
+  Q.forEach((q,qi)=>{
+    h+=`<section class="q" style="--qc:var(${q.c})"><div class="qhead"><h2>${q.name}</h2><span class="muted">${q.sub}</span></div><div class="grid">`;
+    for(let n=qi*12+1;n<=qi*12+12;n++){const x=S[n-1],dd=dateOf(n);const cls=n<cur?'done':n===cur?'now':'';
+      h+=`<button class="chip ${cls}" data-open="${n}"><span class="n">${n}회기 · ${fmt(dd)}${n<cur?' · 완료':''}</span><span class="t">${esc(x[0])}</span><span class="d">♪ ${esc(x[6][0])}</span></button>`}
+    h+='</div></section>'});
+  h+=`<p class="note">날짜는 설정의 1회기 날짜부터 매주 같은 요일로 계산해요. 휴무 주가 있으면 설정에서 1회기 날짜를 옮겨 맞추세요.</p>`;
+  V.innerHTML=h;
+}
+function vSession(){
+  const n=cfg.sel, x=S[n-1], q=qOf(n), d=dateOf(n);
+  V.innerHTML=`<article class="detail" style="--qc:var(${q.c})">
+  <div class="top"><span class="tag" style="background:var(--bg);color:var(--qc)">${q.name}</span><span class="muted">${d.getFullYear()}. ${fmt(d)}(${DOW[d.getDay()]})</span></div>
+  <p class="n" style="color:var(--qc);font-weight:700;margin-top:10px">${n}회기</p><h2>${esc(x[0])}</h2>
+  <div class="sec"><b>오늘의 목표</b><p>${esc(x[1])}</p></div>
+  <div class="sec"><b>음악 활동</b><p>${esc(x[2])}</p></div>
+  <div class="sec"><b>마음 공부 (CBT 포인트)</b><p>${esc(x[3])}</p></div>
+  <div class="sec"><b>예시</b><p class="ex">${esc(x[4])}</p></div>
+  <div class="sec"><b>함께 듣고 부르는 노래</b><p>♪ ${esc(x[6][0])}</p><div class="links"><a class="btn" href="${yt(x[6][1])}" target="_blank" rel="noopener">▶ 유튜브</a><a class="btn spot" href="${sp(x[6][0].replace(/[()]/g,' '))}" target="_blank" rel="noopener">♫ 스포티파이</a></div><p class="note">가사가 필요한 곡은 유튜브 ‘가사 영상’을 함께 보며 불러요.</p></div>
+  <div class="sec"><b>이번 주 과제</b><p>${esc(x[5])}</p></div>
+  <div class="sec"><b>회기 흐름 (55분)</b><p class="muted">마음 날씨·점수 5분 → 여는 노래 7분 → 핵심 활동 25분 → 함께 부르기 8분 → 과제·점수 다시·마무리 노래 10분</p></div>
+  <div class="pager"><button class="btn ghost" data-go="${Math.max(1,n-1)}" ${n===1?'disabled':''}>← 이전 회기</button><button class="btn ghost" data-go="${Math.min(48,n+1)}" ${n===48?'disabled':''}>다음 회기 →</button></div>
+  </article>`;
+}
+let draft={w:'part',a:5,b:5};
+function vDiary(){
+  const log=store.get('log',[]), pl=store.get('pl',['','','']);
+  let wb=Object.entries(W).map(([k,[nm,svg]])=>`<button type="button" data-w="${k}" aria-pressed="${draft.w===k}">${svg}${nm}</button>`).join('');
+  let pts=log.slice(-14);
+  let chart='';
+  if(pts.length){const w=600,h=180,px=36,py=20,sx=i=>px+(pts.length===1?(w-2*px)/2:i*(w-2*px)/(pts.length-1)),sy=v=>h-py-v*(h-2*py)/10;
+    let g='';[0,5,10].forEach(v=>g+=`<line x1="${px}" x2="${w-10}" y1="${sy(v)}" y2="${sy(v)}" stroke="var(--line)"/><text x="6" y="${sy(v)+4}" font-size="12" fill="var(--soft)">${v}</text>`);
+    const pa=pts.map((p,i)=>`${i?'L':'M'}${sx(i)} ${sy(p.b)}`).join(' '),pb=pts.map((p,i)=>`${i?'L':'M'}${sx(i)} ${sy(p.a)}`).join(' ');
+    chart=`<div class="chart"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="최근 점수 변화">${g}<path d="${pb}" fill="none" stroke="var(--soft)" stroke-width="2" stroke-dasharray="5 5"/><path d="${pa}" fill="none" stroke="var(--orange)" stroke-width="3"/>${pts.map((p,i)=>`<circle cx="${sx(i)}" cy="${sy(p.b)}" r="4" fill="var(--orange)"/>`).join('')}</svg><p class="muted"><span style="color:var(--orange);font-weight:700">━ 노래 들은 뒤</span> · <span>┅ 듣기 전</span> · 최근 ${pts.length}일</p></div>`}
+  V.innerHTML=`<h2>오늘의 마음 날씨</h2>
+  <form class="form" id="df"><div class="weather">${wb}</div>
+  <div class="two"><div><label for="sa">듣기 전 점수 <span class="score" id="va">${draft.a}</span></label><input id="sa" type="range" min="0" max="10" value="${draft.a}"></div>
+  <div><label for="sb">노래 들은 뒤 점수 <span class="score" id="vb">${draft.b}</span></label><input id="sb" type="range" min="0" max="10" value="${draft.b}"></div></div>
+  <div><label for="ss">들은 노래</label><input id="ss" type="text" placeholder="예: 말하는 대로"></div>
+  <div><label for="sn">한 줄 메모 (생각·감정·행동)</label><input id="sn" type="text" placeholder="예: 산책하고 나니 마음이 가벼워졌다"></div>
+  <div class="row"><button class="btn" type="submit">오늘 기록 저장</button><span class="muted" id="saved" role="status"></span></div></form>
+  ${chart}
+  <h2>나만의 플레이리스트</h2>
+  <div class="form pl">${['힘낼 때','마음 가라앉힐 때','잠들 때'].map((t,i)=>`<label for="p${i}">${t}</label><div class="row"><input id="p${i}" type="text" value="${esc(pl[i]||'')}" placeholder="노래 제목 · 가수"><a class="btn" data-pl="${i}" href="#" target="_blank" rel="noopener">▶</a></div>`).join('')}</div>
+  <h2>지난 기록</h2><div class="log">${log.length?log.slice().reverse().slice(0,20).map((e,ri)=>`<div class="entry">${W[e.w][1]}<div><b>${e.d} · ${W[e.w][0]} · ${e.a}→${e.b}점</b><p class="muted">${esc(e.s||'')}${e.n?' · '+esc(e.n):''}</p></div><button class="btn ghost" data-del="${log.length-1-ri}" aria-label="이 기록 지우기">지우기</button></div>`).join(''):'<p class="muted">아직 기록이 없어요. 위에서 오늘의 날씨를 골라 첫 기록을 저장해 보세요. (예: 11/26 · 구름 조금 · 5→7점 · 고향의 봄)</p>'}</div>
+  <p class="note">기록은 이 휴대폰(브라우저)에만 저장돼요. 다른 사람에게 보이지 않고, 기기를 바꾸면 따라오지 않아요.</p>`;
+  const plLink=()=>document.querySelectorAll('[data-pl]').forEach(a=>{const v=document.getElementById('p'+a.dataset.pl).value.trim();a.href=v?yt(v+' 가사'):'https://www.youtube.com'});plLink();
+  V.querySelectorAll('.pl input').forEach(inp=>inp.addEventListener('input',()=>{store.set('pl',[0,1,2].map(i=>document.getElementById('p'+i).value));plLink()}));
+  V.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{draft.w=b.dataset.w;V.querySelectorAll('[data-w]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  ['a','b'].forEach(k=>{const r=document.getElementById('s'+k);r.oninput=()=>{draft[k]=+r.value;document.getElementById('v'+k).textContent=r.value}});
+  document.getElementById('df').onsubmit=e=>{e.preventDefault();const t=new Date();const L=store.get('log',[]);L.push({d:fmt(t),iso:`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`,w:draft.w,a:draft.a,b:draft.b,s:document.getElementById('ss').value.trim(),n:document.getElementById('sn').value.trim()});store.set('log',L);vDiary();document.getElementById('saved').textContent='저장했어요'};
+  V.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const L=store.get('log',[]);L.splice(+b.dataset.del,1);store.set('log',L);vDiary()});
+}
+let G=null;
+function newGame(){const a=GAME.slice().sort(()=>Math.random()-.5).slice(0,10);G={a,i:0,ok:0,ans:false}}
+function vGame(){
+  if(!G)newGame();
+  if(G.i>=G.a.length){const best=Math.max(store.get('best',0),G.ok);store.set('best',best);
+    V.innerHTML=`<div class="game"><h2>마음 탐정 결과</h2><p class="score" style="font-size:56px">${G.ok} / ${G.a.length}</p><p>${G.ok>=8?'명탐정이에요! 생각·감정·행동을 잘 구별해요.':G.ok>=5?'좋아요! 헷갈린 카드만 다시 보면 돼요.':'처음엔 다 헷갈려요. 한 번 더 해 볼까요?'}</p><p class="muted">최고 기록 ${best}점</p><div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="again">다시 하기</button></div></div>`;
+    document.getElementById('again').onclick=()=>{newGame();vGame()};return}
+  const [txt,k]=G.a[G.i];
+  V.innerHTML=`<div class="game"><p class="muted">${G.i+1} / ${G.a.length} · 맞힌 개수 ${G.ok}</p>
+  <div class="tri"><svg width="220" height="120" viewBox="0 0 220 120" aria-hidden="true"><path d="M110 14 L196 104 L24 104 Z" fill="none" stroke="var(--line)" stroke-width="3"/><circle cx="110" cy="14" r="10" fill="var(--blue)"/><circle cx="24" cy="104" r="10" fill="var(--orange)"/><circle cx="196" cy="104" r="10" fill="var(--green)"/><text x="126" y="20" font-size="14" fill="var(--blue)" font-weight="700">생각</text><text x="4" y="90" font-size="14" fill="var(--orange)" font-weight="700">감정</text><text x="178" y="90" font-size="14" fill="var(--green)" font-weight="700">행동</text></svg></div>
+  <p class="card-say">“${esc(txt)}”</p>
+  <div class="choices"><button class="c-e" data-k="e">감정</button><button class="c-t" data-k="t">생각</button><button class="c-a" data-k="a">행동</button></div>
+  <p class="fb" id="fb" role="status">이 카드는 감정일까요, 생각일까요, 행동일까요?</p>
+  <button class="btn" id="nx" hidden>다음 카드 →</button></div>
+  <p class="note">수업 중에는 화면을 띄우고 회원들이 감정(주황)·생각(파랑)·행동(초록) 카드를 들게 하면 쓰기 없이 모두 참여할 수 있어요.</p>`;
+  V.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{if(G.ans)return;G.ans=true;const fb=document.getElementById('fb');
+    if(b.dataset.k===k){G.ok++;fb.innerHTML=`<span class="ok">정답! ${GN[k]}이에요.</span> ${GH[k]}`}else{fb.innerHTML=`<span class="no">아쉬워요, ${GN[k]}이에요.</span> ${GH[k]}`}
+    const nx=document.getElementById('nx');nx.hidden=false;nx.focus();nx.onclick=()=>{G.i++;G.ans=false;vGame()}});
+}
+function vSetup(){
+  V.innerHTML=`<h2>설정</h2><form class="form" id="sf">
+  <div><label for="st">1회기 날짜</label><input id="st" type="date" value="${cfg.start}"><p class="muted">이 날짜부터 매주 같은 요일로 48회기 날짜를 계산해요. 지금은 3회기가 ${fmt(dateOf(3))}(${DOW[dateOf(3).getDay()]})이에요.</p></div>
+  <div class="row"><button class="btn" type="submit">저장</button><span class="muted" id="ok" role="status"></span></div></form>
+  <h2>이 앱 쓰는 법</h2>
+  <div class="form"><p><b>진행자</b> · ‘1년 플랜’에서 회기를 눌러 목표·활동·예시·노래 링크를 보고, 수업 화면에 ‘마음 탐정 게임’을 띄워 함께 풀어요.</p>
+  <p><b>회원</b> · 휴대폰에 설치한 ‘마음 다이어리’ 앱의 ‘내 다이어리’에 매일 마음 날씨와 점수, 들은 노래를 적어요.</p>
+  <p class="muted">회원 이름이나 진단 같은 개인정보는 이 앱에 적지 않아요. 노래는 저작권 때문에 가사를 싣지 않고 유튜브·스포티파이로 연결해요.</p></div>
+  <h2>기록 백업</h2>
+  <div class="form"><p class="muted">다이어리 기록은 이 휴대폰에만 저장돼요. 휴대폰을 바꾸거나 앱을 지우기 전에 백업 파일을 만들어 두세요. 백업 파일에는 마음 기록이 들어 있으니 본인만 볼 수 있는 곳에 보관하세요.</p>
+  <div class="row"><button class="btn" type="button" id="bk">백업 파일 만들기</button><label class="btn ghost" style="cursor:pointer">백업 불러오기<input type="file" id="rs" accept=".json,application/json" hidden></label></div>
+  <div id="rsAsk" hidden><p id="rsMsg" style="margin-top:8px"></p><div class="row" style="margin-top:8px"><button class="btn" type="button" id="rsOk">불러오기</button><button class="btn ghost" type="button" id="rsNo">취소</button></div></div></div>
+  <p class="note">마음 다이어리 · maumm.org</p>`;
+  document.getElementById('sf').onsubmit=e=>{e.preventDefault();cfg.start=document.getElementById('st').value||cfg.start;store.set('cfg',cfg);document.getElementById('ok').textContent='저장했어요'};
+  document.getElementById('bk').onclick=backup;
+  let pending=null;
+  document.getElementById('rs').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+    try{const o=JSON.parse(await f.text());if(o.app!=='maum-diary'||!o.data)throw 0;pending=o.data;
+      const n=Array.isArray(o.data.log)?o.data.log.length:0;document.getElementById('rsMsg').textContent=`${o.savedAt?o.savedAt.slice(0,10)+' 백업 · ':''}다이어리 ${n}개 기록. 지금 휴대폰의 기록을 이 파일 내용으로 바꿔요.`;document.getElementById('rsAsk').hidden=false}
+    catch(err){toast('마음 다이어리 백업 파일이 아니에요')}};
+  document.getElementById('rsNo').onclick=()=>{pending=null;document.getElementById('rsAsk').hidden=true};
+  document.getElementById('rsOk').onclick=()=>{if(!pending)return;['cfg','log','pl','best'].forEach(k=>{if(pending[k]!==undefined)store.set(k,pending[k])});Object.assign(cfg,store.get('cfg',{}));pending=null;toast('백업을 불러왔어요');location.hash='diary'};
+}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)}
+function backup(){
+  const t=new Date(),iso=`${t.getFullYear()}${String(t.getMonth()+1).padStart(2,'0')}${String(t.getDate()).padStart(2,'0')}`;
+  const data=JSON.stringify({app:'maum-diary',v:1,savedAt:t.toISOString(),data:{cfg:store.get('cfg',{}),log:store.get('log',[]),pl:store.get('pl',['','','']),best:store.get('best',0)}});
+  const name=`마음다이어리_백업_${iso}.json`;
+  if(window.DiaryAndroid&&DiaryAndroid.saveFile){DiaryAndroid.saveFile(name,'application/json',data);return}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('백업 파일을 저장했어요')}catch(e){toast('백업 파일을 만들지 못했어요')}
+}
+const VIEWS={plan:vPlan,session:vSession,diary:vDiary,game:vGame,setup:vSetup};
+function route(){const v=(location.hash||'#plan').slice(1);const k=VIEWS[v]?v:'plan';document.querySelectorAll('nav a').forEach(a=>a.toggleAttribute('aria-current',a.dataset.v===k)&&a.setAttribute('aria-current','page'));VIEWS[k]();window.scrollTo(0,0)}
+V.addEventListener('click',e=>{const o=e.target.closest('[data-open],[data-go]');if(!o)return;cfg.sel=+(o.dataset.open||o.dataset.go);store.set('cfg',cfg);if(location.hash==='#session')vSession();else location.hash='session'});
+addEventListener('hashchange',route);route();
+</script>
+
+<div class="toast" id="toast" role="status"></div>
+</body></html>

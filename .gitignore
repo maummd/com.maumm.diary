@@ -1,0 +1,14 @@
+.gradle/
+build/
+local.properties
+*.jks
+*.keystore
+.idea/
+*.iml
+node_modules/
+web/demo.html
+android/app/src/main/assets/
+*.json.bak
+seed/
+*.json.bak
+마음다이어리_백업_*.json
