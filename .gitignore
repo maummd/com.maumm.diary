@@ -12,3 +12,4 @@ android/app/src/main/assets/
 seed/
 *.json.bak
 마음다이어리_백업_*.json
+web/

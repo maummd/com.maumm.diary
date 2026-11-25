@@ -16,6 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 화면 만들기 (src → web/index.html)
+        working-directory: .
+        run: |
+          npm ci
+          node build.mjs
+
       - name: 화면 넣기 (web → 앱)
         working-directory: .
         run: |

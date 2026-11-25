@@ -119,6 +119,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}img{max-width:100%}[hidden]
 <main id="view"></main>
 </div>
 
+<script>/*CLOUD*/</script>
 <script>
 const W={
  sun:['맑음','<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="#E9B949"/><g stroke="#E9B949" stroke-width="3" stroke-linecap="round"><path d="M20 3v5M20 32v5M3 20h5M32 20h5M8 8l3 3M29 29l3 3M8 32l3-3M29 11l3-3"/></g></svg>'],
@@ -195,6 +196,49 @@ const GH={e:'한두 단어로 된 마음의 느낌이에요. “~하다”로 �
 
 const store={get(k,d){try{const v=localStorage.getItem('md1y:'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('md1y:'+k,JSON.stringify(v))}catch(e){}}};
 const cfg=Object.assign({start:'2026-11-12',sel:3},store.get('cfg',{}));
+/* ----- 서버 저장 (로그인하면 PC · 아이폰 · 다른 휴대폰에서 같은 다이어리) ----- */
+const MC=window.MC||{on:false};
+const CK=['cfg','log','pl','best'];
+const lts=()=>+localStorage.getItem('md1y:_ts')||0;
+const _set=store.set;
+store.set=(k,v)=>{_set(k,v);if(CK.includes(k)){localStorage.setItem('md1y:_ts',String(Date.now()));cloudPush()}};
+let _pt,syncMsg='';
+function cloudData(){const d={updated:lts()||Date.now()};CK.forEach(k=>d[k]=store.get(k,k==='log'?[]:k==='pl'?['','','']:k==='best'?0:{}));return d}
+function cloudPush(now){if(!MC.on||!MC.user)return;clearTimeout(_pt);_pt=setTimeout(()=>{MC.set('diaries/'+MC.user.uid,cloudData()).then(()=>{syncMsg='☁️ 서버에 저장됨 '+new Date().toTimeString().slice(0,5);acctMsg()}).catch(e=>{syncMsg='⚠️ 서버 저장 실패 — '+MC.err(e);acctMsg()})},now?0:800)}
+function applyServer(d){CK.forEach(k=>{if(d[k]!==undefined&&d[k]!==null)_set(k,d[k])});localStorage.setItem('md1y:_ts',String(d.updated||Date.now()));Object.assign(cfg,store.get('cfg',{}));route()}
+function mergeLogs(a,b){const m=new Map();[...(a||[]),...(b||[])].forEach(x=>m.set(JSON.stringify(x),x));return [...m.values()].sort((x,y)=>String(x.iso||'').localeCompare(String(y.iso||'')))}
+let _unsub=null;
+if(MC.on)MC.onAuth(async u=>{
+  if(_unsub){_unsub();_unsub=null}
+  if(!u){syncMsg='';acctMsg();if(location.hash==='#setup')route();return}
+  syncMsg='서버와 맞추는 중…';acctMsg();
+  let srv=null;try{srv=await MC.get('diaries/'+u.uid)}catch(e){syncMsg='⚠️ '+MC.err(e);acctMsg();return}
+  const local=cloudData(),hasLocal=(local.log||[]).length>0||lts()>0;
+  if(srv&&hasLocal){const newer=(srv.updated||0)>lts()?srv:local;const m={...newer,log:mergeLogs(srv.log,local.log),best:Math.max(+srv.best||0,+local.best||0),updated:Date.now()};applyServer(m);await MC.set('diaries/'+u.uid,m).catch(()=>{});toast('이 휴대폰 기록과 서버 기록을 합쳤어요')}
+  else if(srv)applyServer(srv);
+  else cloudPush(true);
+  syncMsg='☁️ 서버와 연결됨';acctMsg();
+  _unsub=MC.onDoc('diaries/'+u.uid,d=>{if(d&&(d.updated||0)>lts()){applyServer(d);toast('다른 기기에서 쓴 기록을 받았어요')}});
+  if(location.hash==='#setup')route();
+});
+function acctMsg(){const e=document.getElementById('syncMsg');if(e)e.textContent=syncMsg}
+function acctHtml(){
+  if(!MC.on)return '';
+  const u=MC.user;
+  return `<h2>내 계정 · 서버 저장</h2><div class="form" id="acct">${u?`<p><b>${esc(u.email)}</b> 로 로그인했어요.</p><p class="muted">기록이 서버에 저장돼서 PC · 아이폰 · 다른 휴대폰에서 같은 계정으로 로그인하면 이어서 쓸 수 있어요. 내 기록은 나만 볼 수 있어요.</p><p class="muted" id="syncMsg">${esc(syncMsg)}</p><div class="row"><button class="btn ghost" type="button" id="acOut">로그아웃</button></div>`
+   :`<p class="muted">로그인하면 기록이 서버에도 저장돼서 휴대폰을 바꾸거나 PC · 아이폰에서도 이어서 쓸 수 있어요. 내 기록은 나만 볼 수 있어요.</p>
+   <div><label for="acE">이메일</label><input id="acE" type="email" autocomplete="email"></div>
+   <div><label for="acP">비밀번호 (6자 이상)</label><input id="acP" type="password" autocomplete="current-password"></div>
+   <div class="row"><button class="btn" type="button" id="acIn">로그인</button><button class="btn ghost" type="button" id="acUp">처음 가입</button><button class="btn ghost" type="button" id="acRs">비밀번호 찾기</button></div><p class="muted" id="syncMsg" role="status">${esc(syncMsg)}</p>`}</div>`;
+}
+function acctBind(){
+  const $=id=>document.getElementById(id);if(!$('acct'))return;
+  const go=async f=>{try{await f()}catch(e){syncMsg='⚠️ '+MC.err(e);acctMsg()}};
+  if($('acOut'))$('acOut').onclick=()=>go(async()=>{await MC.signOut();toast('로그아웃했어요 — 기록은 이 휴대폰에도 남아 있어요')});
+  if($('acIn'))$('acIn').onclick=()=>go(()=>MC.signIn($('acE').value,$('acP').value));
+  if($('acUp'))$('acUp').onclick=()=>go(()=>MC.signUp($('acE').value,$('acP').value));
+  if($('acRs'))$('acRs').onclick=()=>go(async()=>{if(!$('acE').value.trim()){syncMsg='이메일을 먼저 적어 주세요';acctMsg();return}await MC.reset($('acE').value);syncMsg='비밀번호 재설정 메일을 보냈어요';acctMsg()});
+}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const yt=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q).replace(/%20/g,'+');
 const sp=q=>'https://open.spotify.com/search/'+encodeURIComponent(q);
@@ -288,8 +332,9 @@ function vSetup(){
   <div class="form"><p><b>진행자</b> · ‘1년 플랜’에서 회기를 눌러 목표·활동·예시·노래 링크를 보고, 수업 화면에 ‘마음 탐정 게임’을 띄워 함께 풀어요.</p>
   <p><b>회원</b> · 휴대폰에 설치한 ‘마음 다이어리’ 앱의 ‘내 다이어리’에 매일 마음 날씨와 점수, 들은 노래를 적어요.</p>
   <p class="muted">회원 이름이나 진단 같은 개인정보는 이 앱에 적지 않아요. 노래는 저작권 때문에 가사를 싣지 않고 유튜브·스포티파이로 연결해요.</p></div>
+  ${acctHtml()}
   <h2>기록 백업</h2>
-  <div class="form"><p class="muted">다이어리 기록은 이 휴대폰에만 저장돼요. 휴대폰을 바꾸거나 앱을 지우기 전에 백업 파일을 만들어 두세요. 백업 파일에는 마음 기록이 들어 있으니 본인만 볼 수 있는 곳에 보관하세요.</p>
+  <div class="form"><p class="muted">${MC.on&&MC.user?'기록은 서버에도 저장돼요. 따로 보관하고 싶으면 백업 파일을 만들어 두세요.':'다이어리 기록은 이 휴대폰에만 저장돼요. 휴대폰을 바꾸거나 앱을 지우기 전에 백업 파일을 만들어 두세요.'} 백업 파일에는 마음 기록이 들어 있으니 본인만 볼 수 있는 곳에 보관하세요.</p>
   <div class="row"><button class="btn" type="button" id="bk">백업 파일 만들기</button><label class="btn ghost" style="cursor:pointer">백업 불러오기<input type="file" id="rs" accept=".json,application/json" hidden></label></div>
   <div id="rsAsk" hidden><p id="rsMsg" style="margin-top:8px"></p><div class="row" style="margin-top:8px"><button class="btn" type="button" id="rsOk">불러오기</button><button class="btn ghost" type="button" id="rsNo">취소</button></div></div></div>
   <p class="note">마음 다이어리 · maumm.org</p>`;
@@ -311,7 +356,7 @@ function backup(){
   if(window.DiaryAndroid&&DiaryAndroid.saveFile){DiaryAndroid.saveFile(name,'application/json',data);return}
   try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast('백업 파일을 저장했어요')}catch(e){toast('백업 파일을 만들지 못했어요')}
 }
-const VIEWS={plan:vPlan,session:vSession,diary:vDiary,game:vGame,setup:vSetup};
+const VIEWS={plan:vPlan,session:vSession,diary:vDiary,game:vGame,setup:()=>{vSetup();acctBind()}};
 function route(){const v=(location.hash||'#plan').slice(1);const k=VIEWS[v]?v:'plan';document.querySelectorAll('nav a').forEach(a=>a.toggleAttribute('aria-current',a.dataset.v===k)&&a.setAttribute('aria-current','page'));VIEWS[k]();window.scrollTo(0,0)}
 V.addEventListener('click',e=>{const o=e.target.closest('[data-open],[data-go]');if(!o)return;cfg.sel=+(o.dataset.open||o.dataset.go);store.set('cfg',cfg);if(location.hash==='#session')vSession();else location.hash='session'});
 addEventListener('hashchange',route);route();

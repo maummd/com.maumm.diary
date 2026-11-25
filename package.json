@@ -1,0 +1,11 @@
+{
+  "name": "com.maumm.diary",
+  "version": "1.0.0",
+  "private": true,
+  "description": "com.maumm.diary (maumm.org)",
+  "scripts": { "build": "node build.mjs", "build:local": "LOCAL=1 node build.mjs" },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "firebase": "^11.10.0"
+  }
+}
