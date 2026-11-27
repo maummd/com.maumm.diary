@@ -125,6 +125,28 @@ public class MainActivity extends Activity {
 
     /** 화면(JavaScript)에서 부르는 기능 */
     private class Bridge {
+        /** 문자 · 카카오톡 · 이메일 · 다른 앱으로 바로 보내기 (글자). kind: sms | kakao | email | any */
+        @android.webkit.JavascriptInterface
+        public void sendTo(String kind, String name, String b64, String text, String subject, String address) {
+            runOnUiThread(() -> {
+                try {
+                    Intent i;
+                    if ("sms".equals(kind)) { i = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + (address == null ? "" : address))); i.putExtra("sms_body", text); }
+                    else if ("email".equals(kind)) { i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + (address == null ? "" : address))); i.putExtra(Intent.EXTRA_SUBJECT, subject); i.putExtra(Intent.EXTRA_TEXT, text); }
+                    else { i = new Intent(Intent.ACTION_SEND); i.setType("text/plain"); i.putExtra(Intent.EXTRA_TEXT, text); if (subject != null) i.putExtra(Intent.EXTRA_SUBJECT, subject); }
+                    if ("kakao".equals(kind)) {
+                        i.setPackage("com.kakao.talk");
+                        try { startActivity(i); return; } catch (android.content.ActivityNotFoundException e) {
+                            android.widget.Toast.makeText(MainActivity.this, "카카오톡이 설치되어 있지 않아요 — 다른 앱을 골라 주세요", android.widget.Toast.LENGTH_SHORT).show(); i.setPackage(null); }
+                    }
+                    if ("sms".equals(kind) || "email".equals(kind)) { try { startActivity(i); return; } catch (android.content.ActivityNotFoundException e) { i = new Intent(Intent.ACTION_SEND); i.setType("text/plain"); i.putExtra(Intent.EXTRA_TEXT, text); } }
+                    startActivity(Intent.createChooser(i, "보내기"));
+                } catch (Exception e) {
+                    android.widget.Toast.makeText(MainActivity.this, "보내지 못했어요", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
         @JavascriptInterface
         public void saveFile(String name, String mime, String content) {
             runOnUiThread(() -> {
