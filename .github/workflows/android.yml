@@ -115,6 +115,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create latest out/release/maumdiary-release.apk \
+          gh release create latest out/release/maumdiary-release.apk out/release/maumdiary-release.aab \
             --title "마음 다이어리 최신판 (빌드 ${{ github.run_number }})" \
             --notes "휴대폰에서 maumdiary-release.apk 를 눌러 받아 설치하세요. 버전 1.0.${{ github.run_number }}" --latest
