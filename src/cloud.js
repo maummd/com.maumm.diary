@@ -12,6 +12,11 @@ import {
 import { FIREBASE_CONFIG } from "./config.js";
 
 const clean = d => JSON.parse(JSON.stringify(d ?? null));
+// Firestore는 '목록 안의 목록'을 저장하지 못해요 → 쓸 때 {_l:[…]}로 감싸고 읽을 때 풀어요
+const enc = (v, inArr) => Array.isArray(v) ? (inArr ? { _l: v.map(x => enc(x, true)) } : v.map(x => enc(x, true)))
+  : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, enc(x, false)])) : v;
+const dec = v => Array.isArray(v) ? v.map(dec)
+  : v && typeof v === "object" ? (Object.keys(v).length === 1 && Array.isArray(v._l) ? v._l.map(dec) : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, dec(x)]))) : v;
 const ERR = {
   "auth/invalid-credential": "이메일 또는 비밀번호가 맞지 않아요",
   "auth/wrong-password": "비밀번호가 맞지 않아요",
@@ -45,10 +50,10 @@ function make(config) {
     signUp: (e, p) => createUserWithEmailAndPassword(auth, e.trim(), p),
     signOut: () => signOut(auth),
     reset: e => sendPasswordResetEmail(auth, e.trim()),
-    async get(path) { const s = await getDoc(R(path)); return s.exists() ? s.data() : null; },
-    set: (path, data, merge) => setDoc(R(path), clean(data), merge ? { merge: true } : {}),
+    async get(path) { const s = await getDoc(R(path)); return s.exists() ? dec(s.data()) : null; },
+    set: (path, data, merge) => setDoc(R(path), enc(clean(data)), merge ? { merge: true } : {}),
     del: path => deleteDoc(R(path)),
-    onDoc: (path, cb, err) => onSnapshot(R(path), s => cb(s.exists() ? s.data() : null, s), err),
+    onDoc: (path, cb, err) => onSnapshot(R(path), s => cb(s.exists() ? dec(s.data()) : null, s), err),
     onCol: (path, cb, err) => onSnapshot(C(path), { includeMetadataChanges: false }, cb, err),
     newId: path => doc(C(path)).id,
     async batchSet(items) { // [[path, data], ...]
