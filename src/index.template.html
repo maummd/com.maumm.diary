@@ -121,6 +121,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}img{max-width:100%}[hidden]
 
 <script src="lib/maumm-remind.js"></script>
 <script src="lib/maumm-scan.js"></script>
+<script src="lib/maumm-today.js"></script>
 <script>/*CLOUD*/</script>
 <script>
 const W={
@@ -254,7 +255,7 @@ const V=document.getElementById('view');
 
 function vPlan(){
   const cur=currentN(),done=cur-1, pct=Math.round(done/48*100), s=S[cur-1], d=dateOf(cur);
-  let h=`<div class="next"><div class="big">${cur}회기</div><div><span class="tag now">다음 회기 · ${d.getFullYear()}. ${fmt(d)}(${DOW[d.getDay()]})</span><h3 style="margin-top:6px">${esc(s[0])}</h3><p class="muted">${esc(s[1])}</p><div class="bar" aria-label="진행률 ${pct}%"><i style="width:${pct}%"></i></div><p class="muted">48회기 중 ${done}회기 완료 · ${pct}%</p></div><button class="btn" data-open="${cur}">회기 열기</button></div>`;
+  let h=(window.MToday?'<div id="mtoday"></div>':'')+`<div class="next"><div class="big">${cur}회기</div><div><span class="tag now">다음 회기 · ${d.getFullYear()}. ${fmt(d)}(${DOW[d.getDay()]})</span><h3 style="margin-top:6px">${esc(s[0])}</h3><p class="muted">${esc(s[1])}</p><div class="bar" aria-label="진행률 ${pct}%"><i style="width:${pct}%"></i></div><p class="muted">48회기 중 ${done}회기 완료 · ${pct}%</p></div><button class="btn" data-open="${cur}">회기 열기</button></div>`;
   Q.forEach((q,qi)=>{
     h+=`<section class="q" style="--qc:var(${q.c})"><div class="qhead"><h2>${q.name}</h2><span class="muted">${q.sub}</span></div><div class="grid">`;
     for(let n=qi*12+1;n<=qi*12+12;n++){const x=S[n-1],dd=dateOf(n);const cls=n<cur?'done':n===cur?'now':'';
@@ -262,7 +263,15 @@ function vPlan(){
     h+='</div></section>'});
   h+=`<p class="note">날짜는 설정의 1회기 날짜부터 매주 같은 요일로 계산해요. 휴무 주가 있으면 설정에서 1회기 날짜를 옮겨 맞추세요.</p>`;
   V.innerHTML=h;
+  if(window.MToday)MToday.mount(document.getElementById('mtoday'),{app:'diary',color:'#E8743B',soft:'#FBF1EA',events:diaryEvents,note:'바깥 날씨 · 🎶 회기 · 내 마음 날씨',dayLabel:'열어 보기',
+    onDay:ds=>{const e=(diaryEvents(+ds.slice(0,4),+ds.slice(5,7)-1)[ds]||[]).find(x=>x.n);if(e){cfg.sel=e.n;store.set('cfg',cfg);location.hash='#session'}else location.hash='#diary'}});
 }
+// 첫 화면 달력: 회기 날짜와 내 마음 날씨 기록
+const MOOD_EMO={sun:'☀️',part:'🌤️',cloud:'☁️',rain:'🌧️',storm:'⛈️',fog:'🌫️'};
+function diaryEvents(y,m){const E={},add=(ds,x)=>(E[ds]=E[ds]||[]).push(x),mm=`${y}-${String(m+1).padStart(2,'0')}`,iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  for(let n=1;n<=S.length;n++){const d=dateOf(n),ds=iso(d);if(ds.slice(0,7)===mm)add(ds,{e:'🎶',t:`${n}회기 · ${S[n-1][0]}`,c:'#E8743B',n})}
+  store.get('log',[]).forEach(e=>{if(e.iso&&e.iso.slice(0,7)===mm)add(e.iso,{e:MOOD_EMO[e.w]||'•',t:`내 마음 날씨: ${(W[e.w]||['?'])[0]} · ${e.a}→${e.b}점${e.s?' · ♪ '+e.s:''}`,c:'#7A8CA0'})});
+  return E}
 function vSession(){
   const n=cfg.sel, x=S[n-1], q=qOf(n), d=dateOf(n);
   V.innerHTML=`<article class="detail" style="--qc:var(${q.c})">
